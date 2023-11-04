@@ -1,0 +1,3 @@
+# Every 5 minutes, launch script.sh
+*/5 * * * * /script.sh 2>&1
+# Remember to end this file with an empty new line

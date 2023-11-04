@@ -1,0 +1,82 @@
+version: "3.5"
+services:
+  php:
+      restart: always
+      build: './php/'
+      depends_on:
+          - mysql
+      read_only: true
+      tmpfs:
+          - /tmp
+      volumes:
+          - ./public_html/:/var/www/html/:ro
+          # PAY ATTENTION: SOCK FOLDER NEEDS TO HAVE SETGID AND TO BE CHOWNED TO WWW-DATA GROUP. OTHER SETTINGS ARE NOT SECURE!
+          - ./sock/:/sock/:rw
+          # Enable this volume to have an "upload" folder writeable from anyone from inside the docker
+          # Remember to chmod 777 the public_html_upload folder
+          # Remember to put another service (maybe a cron?) that periodically empties the public_html_upload folder and try to limit its size to prevent abuse
+          - ./public_html_upload/:/var/www/html/upload/:rw
+      environment:
+          - FLAG=flag{fake_flag}
+          - MYSQL_HOST=mysql
+          - MYSQL_DATABASE=webctf
+          - MYSQL_USER=webctf
+          - MYSQL_PASSWORD=placeholder
+      networks:
+          - default
+          - nginx_nolog
+      logging:
+          driver: "json-file"
+          options:
+              max-file: "1"
+              max-size: "10m"
+      #healthcheck:
+      #    test: "/health_checker/health_checker.sh"
+      #    timeout: 20s
+      #    interval: 5m
+      #    retries: 2
+  mysql:
+      restart: always
+      build: './mysql/'
+      volumes:
+          - ./mysql/sql/:/docker-entrypoint-initdb.d/:ro
+      environment:
+          - MYSQL_ROOT_PASSWORD=placeholder
+          - MYSQL_DATABASE=webctf
+          - MYSQL_USER=webctf
+          - MYSQL_PASSWORD=placeholder
+      logging:
+          driver: "json-file"
+          options:
+              max-file: "1"
+              max-size: "10m"
+      healthcheck:
+          test: "mysqladmin status -u $$MYSQL_USER -p$$MYSQL_PASSWORD || exit 1"
+          timeout: 10s
+          interval: 1m30s
+          retries: 2
+  cron:
+      restart: always
+      build: './cron'
+      depends_on:
+          - php
+          - mysql
+      volumes:
+          - ./public_html_upload/:/upload/:rw
+      logging:
+          driver: "json-file"
+          options:
+              max-file: "1"
+              max-size: "2m"    
+      healthcheck:
+          test: "(test -f /healthcheck_file && rm -f /healthcheck_file) || exit 1"
+          timeout: 10s
+          interval: 7m
+          retries: 1
+networks:
+    default:
+        driver_opts:
+            com.docker.network.bridge.name: weakbank2
+        internal: true
+    nginx_nolog:
+        external: true

@@ -1,0 +1,12 @@
+# Sock folder content
+sock/*
+!sock/.gitkeep
+
+# Public HTML Upload folder content
+public_html_upload/*
+!public_html_upload/.gitkeep
+public_html/upload/*
+!public_html/upload/.gitkeep
+
+# Docker-compose override
+docker-compose.override.yml

@@ -1,0 +1,39 @@
+body {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+}
+
+main {
+  flex: 1 0 auto;
+}
+    
+
+.card{
+  margin: 3px 0 0rem 0!important;
+}
+.small{
+  height:246px!important;
+}
+#news .col.l7 ,.col.l5 {
+  padding:2px;
+}
+.news-container{
+  margin-top:70px!important;
+}
+.news-container-big{
+  margin-top: 200px;
+}
+
+#bonifico,#storico,#info{
+  margin-top: 3%!important;
+}
+#mod_pass input[type="password"]{
+  border-radius:20px;
+  background: white;
+  border:1px solid grey;
+}
+
+/* label focus color */
+
+
